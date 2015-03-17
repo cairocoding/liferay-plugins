@@ -60,7 +60,6 @@ public class KBArticleImporter {
 
 	public int processZipFile(
 			long userId, long groupId, long parentKBFolderId,
-			boolean prioritizeUpdatedKBArticles,
 			boolean prioritizeByNumericalPrefix, InputStream inputStream,
 			ServiceContext serviceContext)
 		throws PortalException, SystemException {
@@ -76,9 +75,8 @@ public class KBArticleImporter {
 			Map<String, String> metadata = getMetadata(zipReader);
 
 			return processKBArticleFiles(
-				userId, groupId, parentKBFolderId, prioritizeUpdatedKBArticles,
-				prioritizeByNumericalPrefix, zipReader, metadata,
-				serviceContext);
+				userId, groupId, parentKBFolderId, prioritizeByNumericalPrefix,
+				zipReader, metadata, serviceContext);
 		}
 		catch (IOException ioe) {
 			throw new KBArticleImportException(ioe);
@@ -177,12 +175,13 @@ public class KBArticleImporter {
 	}
 
 	protected Map<String, List<String>> getFolderNameFileEntryNamesMap(
-		ZipReader zipReader) {
+			ZipReader zipReader)
+		throws KBArticleImportException {
 
 		Map<String, List<String>> folderNameFileEntryNamesMap =
 			new TreeMap<String, List<String>>();
 
-		for (String zipEntry : zipReader.getEntries()) {
+		for (String zipEntry : _getEntries(zipReader)) {
 			String extension = FileUtil.getExtension(zipEntry);
 
 			if (!ArrayUtil.contains(
@@ -253,7 +252,6 @@ public class KBArticleImporter {
 
 	protected int processKBArticleFiles(
 			long userId, long groupId, long parentKBFolderId,
-			boolean prioritizeUpdatedKBArticles,
 			boolean prioritizeByNumericalPrefix, ZipReader zipReader,
 			Map<String, String> metadata, ServiceContext serviceContext)
 		throws PortalException, SystemException {
@@ -262,8 +260,7 @@ public class KBArticleImporter {
 
 		PrioritizationStrategy prioritizationStrategy =
 			PrioritizationStrategy.create(
-				groupId, parentKBFolderId, prioritizeUpdatedKBArticles,
-				prioritizeByNumericalPrefix);
+				groupId, parentKBFolderId, prioritizeByNumericalPrefix);
 
 		Map<String, List<String>> folderNameFileEntryNamesMap =
 			getFolderNameFileEntryNamesMap(zipReader);
@@ -337,6 +334,18 @@ public class KBArticleImporter {
 		prioritizationStrategy.prioritizeKBArticles();
 
 		return importedKBArticleCount;
+	}
+
+	private List<String> _getEntries(ZipReader zipReader)
+		throws KBArticleImportException {
+
+		try {
+			return zipReader.getEntries();
+		}
+		catch (NullPointerException npe) {
+			throw new KBArticleImportException(
+				"The uploaded file is not a ZIP archive or it is corrupted");
+		}
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(KBArticleImporter.class);

@@ -36,6 +36,7 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.model.Group;
 import com.liferay.portal.model.Lock;
 import com.liferay.portal.service.GroupLocalServiceUtil;
+import com.liferay.portal.service.ServiceContext;
 import com.liferay.portlet.documentlibrary.NoSuchFileVersionException;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.model.DLFileEntryConstants;
@@ -46,6 +47,7 @@ import com.liferay.sync.SyncSiteUnavailableException;
 import com.liferay.sync.model.SyncConstants;
 import com.liferay.sync.model.SyncDLObject;
 import com.liferay.sync.model.impl.SyncDLObjectImpl;
+import com.liferay.sync.shared.util.SyncPermissionsConstants;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -334,6 +336,34 @@ public class SyncUtil {
 		}
 	}
 
+	public static void setFilePermissions(
+		Group group, boolean folder, ServiceContext serviceContext) {
+
+		int syncSiteMemberFilePermissions = GetterUtil.getInteger(
+			group.getTypeSettingsProperty("syncSiteMemberFilePermissions"));
+
+		if (syncSiteMemberFilePermissions ==
+				SyncPermissionsConstants.PERMISSIONS_DEFAULT) {
+
+			serviceContext.setDeriveDefaultPermissions(true);
+
+			return;
+		}
+
+		String[] resourceActions = null;
+
+		if (folder) {
+			resourceActions = SyncPermissionsConstants.getFolderResourceActions(
+				syncSiteMemberFilePermissions);
+		}
+		else {
+			resourceActions = SyncPermissionsConstants.getFileResourceActions(
+				syncSiteMemberFilePermissions);
+		}
+
+		serviceContext.setGroupPermissions(resourceActions);
+	}
+
 	public static SyncDLObject toSyncDLObject(
 			DLFileEntry dlFileEntry, String event, boolean calculateChecksum)
 		throws PortalException, SystemException {
@@ -397,8 +427,9 @@ public class SyncUtil {
 		syncDLObject.setMimeType(dlFileVersion.getMimeType());
 		syncDLObject.setDescription(dlFileVersion.getDescription());
 		syncDLObject.setChangeLog(dlFileVersion.getChangeLog());
-		syncDLObject.setExtraSettings(dlFileVersion.getExtraSettings());
+		syncDLObject.setExtraSettings(StringPool.BLANK);
 		syncDLObject.setVersion(dlFileVersion.getVersion());
+		syncDLObject.setVersionId(dlFileVersion.getFileVersionId());
 		syncDLObject.setSize(dlFileVersion.getSize());
 
 		if (calculateChecksum) {
@@ -436,6 +467,7 @@ public class SyncUtil {
 		syncDLObject.setChangeLog(StringPool.BLANK);
 		syncDLObject.setExtraSettings(StringPool.BLANK);
 		syncDLObject.setVersion(StringPool.BLANK);
+		syncDLObject.setVersionId(0);
 		syncDLObject.setSize(0);
 		syncDLObject.setChecksum(StringPool.BLANK);
 		syncDLObject.setEvent(event);

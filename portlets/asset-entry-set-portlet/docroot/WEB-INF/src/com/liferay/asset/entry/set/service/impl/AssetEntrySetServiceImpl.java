@@ -22,10 +22,9 @@ import com.liferay.asset.entry.set.service.permission.AssetEntrySetPermissionUti
 import com.liferay.asset.entry.set.util.ActionKeys;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.model.User;
-import com.liferay.portal.service.ClassNameLocalServiceUtil;
 
 import java.io.File;
 
@@ -40,8 +39,7 @@ public class AssetEntrySetServiceImpl extends AssetEntrySetServiceBaseImpl {
 	@Override
 	public AssetEntrySet addAssetEntrySet(
 			long parentAssetEntrySetId, long creatorClassNameId,
-			long creatorClassPK, String payload, File file,
-			boolean privateAssetEntrySet)
+			long creatorClassPK, String payload, boolean privateAssetEntrySet)
 		throws PortalException, SystemException {
 
 		AssetEntrySetPermissionUtil.check(
@@ -53,59 +51,68 @@ public class AssetEntrySetServiceImpl extends AssetEntrySetServiceBaseImpl {
 
 		return assetEntrySetLocalService.addAssetEntrySet(
 			getUserId(), parentAssetEntrySetId, creatorClassNameId,
-			creatorClassPK, payloadJSONObject, file, privateAssetEntrySet);
+			creatorClassPK, payloadJSONObject, privateAssetEntrySet);
 	}
 
 	@Override
-	public AssetEntrySet addAssetEntrySet(
-			long parentAssetEntrySetId, String payload, File file,
-			boolean privateAssetEntrySet)
+	public JSONObject addFileAttachment(File file)
 		throws PortalException, SystemException {
 
-		AssetEntrySetPermissionUtil.check(
-			getPermissionChecker(), _CLASS_NAME_ID_USER, getUserId(),
-			ActionKeys.ADD_ASSET_ENTRY_SET);
-
-		JSONObject payloadJSONObject = JSONFactoryUtil.createJSONObject(
-			payload);
-
-		return assetEntrySetLocalService.addAssetEntrySet(
-			getUserId(), parentAssetEntrySetId, payloadJSONObject, file,
-			privateAssetEntrySet);
+		return assetEntrySetLocalService.addFileAttachment(getUserId(), file);
 	}
 
 	@Override
-	public AssetEntrySet addAssetEntrySet(
-			String payload, File file, boolean privateAssetEntrySet)
+	public AssetEntrySet deleteAssetEntrySet(long assetEntrySetId)
 		throws PortalException, SystemException {
 
 		AssetEntrySetPermissionUtil.check(
-			getPermissionChecker(), _CLASS_NAME_ID_USER, getUserId(),
-			ActionKeys.ADD_ASSET_ENTRY_SET);
+			getPermissionChecker(), assetEntrySetId, ActionKeys.DELETE);
 
-		JSONObject payloadJSONObject = JSONFactoryUtil.createJSONObject(
-			payload);
+		return assetEntrySetLocalService.deleteAssetEntrySet(assetEntrySetId);
+	}
 
-		return assetEntrySetLocalService.addAssetEntrySet(
-			getUserId(), payloadJSONObject, file, privateAssetEntrySet);
+	@Override
+	public AssetEntrySet getAssetEntrySet(
+			long assetEntrySetId, int childAssetEntrySetsLimit,
+			int likedParticipantsLimit)
+		throws PortalException, SystemException {
+
+		AssetEntrySetPermissionUtil.check(
+			getPermissionChecker(), assetEntrySetId, ActionKeys.VIEW);
+
+		return assetEntrySetLocalService.getAssetEntrySet(
+			getUserId(), assetEntrySetId, childAssetEntrySetsLimit,
+			likedParticipantsLimit);
 	}
 
 	@Override
 	public List<AssetEntrySet> getNewAssetEntrySets(
-			long createTime, long parentAssetEntrySetId, int start, int end)
+			long createTime, long parentAssetEntrySetId, String sharedTo,
+			String[] assetTagNames, int childAssetEntrySetsLimit,
+			int likedParticipantsLimit, int start, int end)
 		throws PortalException, SystemException {
 
+		JSONArray sharedToJSONArray = JSONFactoryUtil.createJSONArray(sharedTo);
+
 		return assetEntrySetLocalService.getNewAssetEntrySets(
-			getUserId(), createTime, parentAssetEntrySetId, start, end);
+			getUserId(), createTime, parentAssetEntrySetId, sharedToJSONArray,
+			assetTagNames, childAssetEntrySetsLimit, likedParticipantsLimit,
+			start, end);
 	}
 
 	@Override
 	public List<AssetEntrySet> getOldAssetEntrySets(
-			long createTime, long parentAssetEntrySetId, int start, int end)
+			long createTime, long parentAssetEntrySetId, String sharedTo,
+			String[] assetTagNames, int childAssetEntrySetsLimit,
+			int likedParticipantsLimit, int start, int end)
 		throws PortalException, SystemException {
 
+		JSONArray sharedToJSONArray = JSONFactoryUtil.createJSONArray(sharedTo);
+
 		return assetEntrySetLocalService.getOldAssetEntrySets(
-			getUserId(), createTime, parentAssetEntrySetId, start, end);
+			getUserId(), createTime, parentAssetEntrySetId, sharedToJSONArray,
+			assetTagNames, childAssetEntrySetsLimit, likedParticipantsLimit,
+			start, end);
 	}
 
 	@Override
@@ -124,7 +131,17 @@ public class AssetEntrySetServiceImpl extends AssetEntrySetServiceBaseImpl {
 			getUserId(), assetEntrySetId);
 	}
 
-	private static final long _CLASS_NAME_ID_USER =
-		ClassNameLocalServiceUtil.getClassNameId(User.class);
+	@Override
+	public AssetEntrySet updateAssetEntrySet(
+			long assetEntrySetId, JSONObject payloadJSONObject,
+			boolean privateAssetEntrySet)
+		throws PortalException, SystemException {
+
+		AssetEntrySetPermissionUtil.check(
+			getPermissionChecker(), assetEntrySetId, ActionKeys.UPDATE);
+
+		return assetEntrySetLocalService.updateAssetEntrySet(
+			assetEntrySetId, payloadJSONObject, privateAssetEntrySet);
+	}
 
 }

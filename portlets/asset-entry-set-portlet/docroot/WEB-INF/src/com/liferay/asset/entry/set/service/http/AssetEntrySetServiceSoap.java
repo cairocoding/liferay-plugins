@@ -62,13 +62,64 @@ import java.rmi.RemoteException;
  * @generated
  */
 public class AssetEntrySetServiceSoap {
+	public static com.liferay.asset.entry.set.model.AssetEntrySetSoap addAssetEntrySet(
+		long parentAssetEntrySetId, long creatorClassNameId,
+		long creatorClassPK, java.lang.String payload,
+		boolean privateAssetEntrySet) throws RemoteException {
+		try {
+			com.liferay.asset.entry.set.model.AssetEntrySet returnValue = AssetEntrySetServiceUtil.addAssetEntrySet(parentAssetEntrySetId,
+					creatorClassNameId, creatorClassPK, payload,
+					privateAssetEntrySet);
+
+			return com.liferay.asset.entry.set.model.AssetEntrySetSoap.toSoapModel(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static com.liferay.asset.entry.set.model.AssetEntrySetSoap deleteAssetEntrySet(
+		long assetEntrySetId) throws RemoteException {
+		try {
+			com.liferay.asset.entry.set.model.AssetEntrySet returnValue = AssetEntrySetServiceUtil.deleteAssetEntrySet(assetEntrySetId);
+
+			return com.liferay.asset.entry.set.model.AssetEntrySetSoap.toSoapModel(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static com.liferay.asset.entry.set.model.AssetEntrySetSoap getAssetEntrySet(
+		long assetEntrySetId, int childAssetEntrySetsLimit,
+		int likedParticipantsLimit) throws RemoteException {
+		try {
+			com.liferay.asset.entry.set.model.AssetEntrySet returnValue = AssetEntrySetServiceUtil.getAssetEntrySet(assetEntrySetId,
+					childAssetEntrySetsLimit, likedParticipantsLimit);
+
+			return com.liferay.asset.entry.set.model.AssetEntrySetSoap.toSoapModel(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
 	public static com.liferay.asset.entry.set.model.AssetEntrySetSoap[] getNewAssetEntrySets(
-		long createTime, long parentAssetEntrySetId, int start, int end)
+		long createTime, long parentAssetEntrySetId, java.lang.String sharedTo,
+		java.lang.String[] assetTagNames, int childAssetEntrySetsLimit,
+		int likedParticipantsLimit, int start, int end)
 		throws RemoteException {
 		try {
 			java.util.List<com.liferay.asset.entry.set.model.AssetEntrySet> returnValue =
 				AssetEntrySetServiceUtil.getNewAssetEntrySets(createTime,
-					parentAssetEntrySetId, start, end);
+					parentAssetEntrySetId, sharedTo, assetTagNames,
+					childAssetEntrySetsLimit, likedParticipantsLimit, start, end);
 
 			return com.liferay.asset.entry.set.model.AssetEntrySetSoap.toSoapModels(returnValue);
 		}
@@ -80,12 +131,15 @@ public class AssetEntrySetServiceSoap {
 	}
 
 	public static com.liferay.asset.entry.set.model.AssetEntrySetSoap[] getOldAssetEntrySets(
-		long createTime, long parentAssetEntrySetId, int start, int end)
+		long createTime, long parentAssetEntrySetId, java.lang.String sharedTo,
+		java.lang.String[] assetTagNames, int childAssetEntrySetsLimit,
+		int likedParticipantsLimit, int start, int end)
 		throws RemoteException {
 		try {
 			java.util.List<com.liferay.asset.entry.set.model.AssetEntrySet> returnValue =
 				AssetEntrySetServiceUtil.getOldAssetEntrySets(createTime,
-					parentAssetEntrySetId, start, end);
+					parentAssetEntrySetId, sharedTo, assetTagNames,
+					childAssetEntrySetsLimit, likedParticipantsLimit, start, end);
 
 			return com.liferay.asset.entry.set.model.AssetEntrySetSoap.toSoapModels(returnValue);
 		}
@@ -114,6 +168,23 @@ public class AssetEntrySetServiceSoap {
 		long assetEntrySetId) throws RemoteException {
 		try {
 			com.liferay.asset.entry.set.model.AssetEntrySet returnValue = AssetEntrySetServiceUtil.unlikeAssetEntrySet(assetEntrySetId);
+
+			return com.liferay.asset.entry.set.model.AssetEntrySetSoap.toSoapModel(returnValue);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static com.liferay.asset.entry.set.model.AssetEntrySetSoap updateAssetEntrySet(
+		long assetEntrySetId,
+		com.liferay.portal.kernel.json.JSONObject payloadJSONObject,
+		boolean privateAssetEntrySet) throws RemoteException {
+		try {
+			com.liferay.asset.entry.set.model.AssetEntrySet returnValue = AssetEntrySetServiceUtil.updateAssetEntrySet(assetEntrySetId,
+					payloadJSONObject, privateAssetEntrySet);
 
 			return com.liferay.asset.entry.set.model.AssetEntrySetSoap.toSoapModel(returnValue);
 		}
